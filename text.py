@@ -2,92 +2,74 @@ import tensorflow as tf
 import numpy as np
 import cv2
 import time
-
-import conversion_model
+import libraries    # 导入自己写的函数库
 
 model_path1 = ''  # 输入加载模型绝对路径
 output_model_path = ''  # 模型输出路径
 
-conversion_model.conversion_model(model_path1, output_model_path)    # 调用函数
+libraries.conversion_model(model_path1, output_model_path)  # 调用函数
 
-interpreter = tf.lite.Interpreter(model_path=model_path1)
-interpreter.allocate_tensors()      # 加载模型
+interpreter = tf.lite.Interpreter(model_path=output_model_path)     # 从模型指定路径加载并且创建实例tf.lite.Interpreter使用模型
+interpreter.allocate_tensors()  # 为模型所有张量分配空间
 
 input_details = interpreter.get_input_details()
-output_details = interpreter.get_output_details()
+output_details = interpreter.get_output_details()   # 获取模型的输入和输出细节
 
-cap = cv2.VideoCapture(0)   # 选定摄像头
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)      # 宽度像素
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)     # 高度像素
+cap = cv2.VideoCapture(0)  # 选定摄像头
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)  # 宽度像素
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)  # 高度像素
 
-detected_objects = []  # 用于存储检测到的对象坐标
+#摄像头帧数还没设定
+
+detected_objects = []  # 用于存储检测到的对象坐标表格
 
 frame_number = 0  # 用于记录帧号
 
-while True:
+while True:     # 判断是或否有帧输出，如果没有则终止程序
     ret, frame = cap.read()
     if not ret:
         break
 
-    resized_frame = cv2.resize(frame, (input_details[0]['shape'][1], input_details[0]['shape'][2]))   # 处理图像
-    input_data = np.expand_dims(resized_frame, axis=0)
+    resized_frame = cv2.resize(frame, (input_details[0]['shape'][1], input_details[0]['shape'][2]))  # 调整图像大小使得图像适合模型
+    input_data = np.expand_dims(resized_frame, axis=0)      # 增加维度
 
-    interpreter.set_tensor(input_details[0]['index'], input_data)  # 图像输入模型
-    interpreter.invoke()
+    interpreter.set_tensor(input_details[0]['index'], input_data)  # 设置模型张量值，把预处理的图像赋值模型输入层
+    interpreter.invoke()  # 调用模型进行推理
 
-    boxes = interpreter.get_tensor(output_details[0]['index'])[0]
-    classes = interpreter.get_tensor(output_details[1]['index'])[0]
-    scores = interpreter.get_tensor(output_details[2]['index'])[0]
+    boxes = interpreter.get_tensor(output_details[0]['index'])[0]  # 得到对象边界框
+    classes = interpreter.get_tensor(output_details[1]['index'])[0]     # 提取类别
+    scores = interpreter.get_tensor(output_details[2]['index'])[0]      #提取置信度得分
 
     detected_objects.clear()  # 清空上一帧的检测结果
 
-    for i in range(len(scores)):
-        if scores[i] == 1 and 2 and 3:
-            ymin, xmin, ymax, xmax = boxes[i]
-            ymin = int(ymin * frame.shape[0])
-            xmin = int(xmin * frame.shape[1])
-            ymax = int(ymax * frame.shape[0])
-            xmax = int(xmax * frame.shape[1])
+    # 从利用模型图片中提取所有对象的坐标保存在detected_objects列表中
+    libraries.add_detected_objects_to_list(boxes, classes, scores, frame.shape[:2], detected_objects)
 
+    if detected_objects:     # 检测detected_objects是否为空
+        time.sleep(10)  # 检测到物体延时10秒
+        detected_objects.clear()    # 清除列表
 
-            # 存储坐标点
-            obj_coordinates = {
-                'xmin': xmin,
-                'ymin': ymin,
-                'xmax': xmax,
-                'ymax': ymax,
-                'class': int(classes[i]),
-                'score': scores[i]
-            }
-            detected_objects.append(obj_coordinates)
-            if detected_objects:
-                
-            # 绘制边界框和标签
-            cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
-            label = f"Class: {int(classes[i])}, Score: {scores[i]:.2f}"
-            cv2.putText(frame, label, (xmin, ymin - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+        # 再次得到坐标放进列表
+        libraries.add_detected_objects_to_list(boxes, classes, scores, frame.shape[:2], detected_objects)
 
-    # 显示结果
-    cv2.imshow('show', frame)
+        for index, obj in enumerate(detected_objects):  # 利用enumerate函数例举出所有对象的值并放在obj当中
+            x = (obj['x1'] + obj['x2']) / 2
+            y = (obj['y1'] + obj['y2']) / 2
 
-    # 访问坐标值并进行处理
-    frame_number += 1
+            #这一步对对象进行分类排序，推导出夹取顺序
 
-    # 遍历 `detected_objects` 并访问坐标值
-    for index, obj in enumerate(detected_objects):
-        x = (obj['xmin'] + obj['xmax'])/2
-        y = (obj['ymin'] + obj['ymax'])/2
+            cv2.rectangle(frame, (obj['x1'], obj['y1']), (obj['x2'], obj['y2']), (0, 255, 0), 2)  # 绘制边框
+            label = f"Class: {int(obj['class'])}, Score: {obj['score']:.2f}"
+            cv2.putText(frame, label, (obj['x1'], obj['y1'] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+            # 访问坐标值并进行处理
+            frame_number += 1  # 保存坐标文件
+            with open('object_coordinates.txt', mode='a') as file:
+                file.write(f"Frame: {frame_number}, Object: {index + 1}\n")
+                file.write(f"Xmin: {obj['x1']}, Ymin: {obj['y1']}, Xmax: {obj['x2']}, Ymax: {obj['y2']}\n")
+                file.write(f"Class: {obj['class']}, Score: {obj['score']:.2f}\n")
+                file.write("\n")  # 分隔每组数据
 
-        # 打印坐标值
-        print(f"Object {index + 1}:")
-        print(f"X轴距离是 {x}, Y轴距离是{y}")
-
-        # 保存坐标到文件
-        with open('object_coordinates.txt', mode='a') as file:
-            file.write(f"Frame: {frame_number}, Object: {index + 1}\n")
-            file.write(f"Xmin: {xmin}, Ymin: {ymin}, Xmax: {xmax}, Ymax: {ymax}\n")
-            file.write(f"Class: {obj['class']}, Score: {obj['score']:.2f}\n")
-            file.write("\n")  # 分隔每组数据
+                cv2.imshow('show', frame)  # 展示图像
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
