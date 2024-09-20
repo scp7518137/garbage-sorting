@@ -17,8 +17,8 @@ input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()   # 获取模型的输入和输出细节
 
 cap = cv2.VideoCapture(0)  # 选定摄像头
-cap.set(cv2.CAP_PROP_FPS, 20)
-actual_fps = cap.get(cv2.CAP_PROP_FPS)
+# cap.set(cv2.CAP_PROP_FPS, 20)
+# actual_fps = cap.get(cv2.CAP_PROP_FPS)
 capture_interval = 10   # 拍摄间隔
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)  # 宽度像素
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)  # 高度像素
@@ -54,12 +54,11 @@ while True:     # 判断是或否有帧输出，如果没有则终止程序
         # 再次得到坐标放进列表
         libraries.add_detected_objects_to_list(boxes, classes, scores, frame.shape[:2], detected_objects)
 
+        classified_objects = libraries.classify_class(detected_objects)   # 使用分类函数分开不同种类的垃圾
         buffer_str.clear()  # 清除缓存列表
-        for index, obj in enumerate(detected_objects):  # 利用enumerate函数例举出所有对象的值并放在obj当中
+        for index, obj in enumerate(classified_objects):  # 利用enumerate函数例举出所有对象的值并放在obj当中
             x = (obj['x1'] + obj['x2']) / 2     # 计算中心点x坐标
             y = (obj['y1'] + obj['y2']) / 2     # 计算中心点y坐标
-
-            #这一步对对象进行分类排序，推导出夹取顺序
 
             cv2.rectangle(frame, (obj['x1'], obj['y1']), (obj['x2'], obj['y2']), (0, 255, 0), 2)  # 绘制边框
             label = f"Class: {int(obj['class'])}, Score: {obj['score']:.2f}"    # 设置标签
@@ -67,7 +66,7 @@ while True:     # 判断是或否有帧输出，如果没有则终止程序
             # 设置标签坐标值并显示
             frame_number += 1  # 帧数递增
 
-            buffer_str.append(f"Frame: {frame_number}, Object: {index + 1}\n")
+            buffer_str.append(f"Frame: {frame_number}, Object: {index + 1}\n")  # 将数据存放在缓存中
             buffer_str.append(f"Xmin: {obj['x1']}, Ymin: {obj['y1']}, Xmax: {obj['x2']}, Ymax: {obj['y2']}\n")
             buffer_str.append(f"Class: {obj['class']}, Score: {obj['score']:.2f}\n")
             buffer_str.append("\n")
@@ -77,7 +76,7 @@ while True:     # 判断是或否有帧输出，如果没有则终止程序
                     file.writelines(buffer_str)  # 一次性写入所有数据
                 buffer_str.clear()  # 清空缓冲区
 
-            with open('object_coordinates.txt', mode='a') as file:
+            with open('object_coordinates.txt', mode='a') as file:  # 将数据存放在文件
                 file.write(f"Frame: {frame_number}, Object: {index + 1}\n")
                 file.write(f"Xmin: {obj['x1']}, Ymin: {obj['y1']}, Xmax: {obj['x2']}, Ymax: {obj['y2']}\n")
                 file.write(f"Class: {obj['class']}, Score: {obj['score']:.2f}\n")
