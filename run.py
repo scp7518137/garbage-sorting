@@ -16,7 +16,7 @@ interpreter.allocate_tensors()  # 为模型所有张量分配空间
 input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()   # 获取模型的输入和输出细节
 
-cap = cv2.VideoCapture(0)  # 选定摄像头
+cap = cv2.VideoCapture('/dev/video14')  # 选定摄像头
 # cap.set(cv2.CAP_PROP_FPS, 20)
 # actual_fps = cap.get(cv2.CAP_PROP_FPS)
 capture_interval = 10   # 拍摄间隔

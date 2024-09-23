@@ -12,4 +12,3 @@ for device in video_devices:
     else:
         print(f"无法打开摄像头设备 {device}")
     cap.release()
-    
