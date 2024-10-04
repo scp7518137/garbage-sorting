@@ -2,9 +2,45 @@ import tensorflow as tf
 import numpy as np
 import cv2
 import time
+import pigpio
 import libraries    # 导入自己写的函数库
 
-buffer_str = []   # 创建缓存区
+pi = pigpio.pi()
+
+i = 0
+
+servoPin1 = 1  # x轴舵机
+servoPin2 = 2  # y轴舵机
+servoPin3 = 3  # 东舵机
+servoPin4 = 4  # 南舵机
+servoPin5 = 5  # 西舵机
+servoPin6 = 6  # 北舵机
+servoPin7 = 7  # 中舵机
+servoPin8 = 8  # 夹舵机
+servoPin9 = 9
+servoPin10 = 10
+servoPin11 = 11
+
+frequency = 50
+
+zero = 750     # 微秒，对应0度
+oh_eighty = 2250    # 微秒，对应180度
+ninety = 1500   # 微秒，对应90度
+
+pi.set_servo_pulsewidth(servoPin1, zero)
+pi.set_servo_pulsewidth(servoPin2, zero)
+pi.set_servo_pulsewidth(servoPin3, zero)
+pi.set_servo_pulsewidth(servoPin4, zero)
+pi.set_servo_pulsewidth(servoPin5, zero)
+pi.set_servo_pulsewidth(servoPin6, zero)
+pi.set_servo_pulsewidth(servoPin7, zero)
+pi.set_servo_pulsewidth(servoPin8, zero)
+pi.set_servo_pulsewidth(servoPin9, zero)
+pi.set_servo_pulsewidth(servoPin10, zero)
+pi.set_servo_pulsewidth(servoPin11, zero)
+
+
+# buffer_str = []   # 创建缓存区
 model_path1 = '/home/classify/garbage-sorting/model/input/best.h5'  # 输入加载模型绝对路径
 output_model_path = '/home/classify/garbage-sorting/model/'  # 模型输出路径
 
@@ -25,7 +61,7 @@ cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)  # 高度像素
 
 detected_objects = []  # 用于存储检测到的对象坐标表格
 
-frame_number = 0  # 用于记录帧号
+picture_number = 0  # 用于记录图片数量
 
 while True:     # 判断是或否有帧输出，如果没有则终止程序
     ret, frame = cap.read()
@@ -55,34 +91,12 @@ while True:     # 判断是或否有帧输出，如果没有则终止程序
         libraries.add_detected_objects_to_list(boxes, classes, scores, frame.shape[:2], detected_objects)
 
         classified_objects = libraries.classify_class(detected_objects)   # 使用分类函数分开不同种类的垃圾
-        buffer_str.clear()  # 清除缓存列表
+        # buffer_str.clear()  # 清除缓存列表
         for index, obj in enumerate(classified_objects):  # 利用enumerate函数例举出所有对象的值并放在obj当中
             x = (obj['x1'] + obj['x2']) / 2     # 计算中心点x坐标
             y = (obj['y1'] + obj['y2']) / 2     # 计算中心点y坐标
 
-            cv2.rectangle(frame, (obj['x1'], obj['y1']), (obj['x2'], obj['y2']), (0, 255, 0), 2)  # 绘制边框
-            label = f"Class: {int(obj['class'])}, Score: {obj['score']:.2f}"    # 设置标签
-            cv2.putText(frame, label, (obj['x1'], obj['y1'] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-            # 设置标签坐标值并显示
-            frame_number += 1  # 帧数递增
-
-            buffer_str.append(f"Frame: {frame_number}, Object: {index + 1}\n")  # 将数据存放在缓存中
-            buffer_str.append(f"Xmin: {obj['x1']}, Ymin: {obj['y1']}, Xmax: {obj['x2']}, Ymax: {obj['y2']}\n")
-            buffer_str.append(f"Class: {obj['class']}, Score: {obj['score']:.2f}\n")
-            buffer_str.append("\n")
-
-            if len(buffer_str) >= 4:  # 每个对象有4行数据
-                with open('object_coordinates.txt', mode='a') as file:
-                    file.writelines(buffer_str)  # 一次性写入所有数据
-                buffer_str.clear()  # 清空缓冲区
-
-            with open('object_coordinates.txt', mode='a') as file:  # 将数据存放在文件
-                file.write(f"Frame: {frame_number}, Object: {index + 1}\n")
-                file.write(f"Xmin: {obj['x1']}, Ymin: {obj['y1']}, Xmax: {obj['x2']}, Ymax: {obj['y2']}\n")
-                file.write(f"Class: {obj['class']}, Score: {obj['score']:.2f}\n")
-                file.write("\n")  # 分隔每组数据
-
-                cv2.imshow('show', frame)  # 展示图像
+            cv2.imshow('show', frame)  # 展示图像
     time.sleep(capture_interval)    # 等待capture_interval秒后拍下一张照片
 
     if cv2.waitKey(1) & 0xFF == ord('q'):   # 检测到q键之后关闭窗口
