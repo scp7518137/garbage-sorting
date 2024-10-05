@@ -17,39 +17,52 @@
 # file.write(f"Class: {obj['class']}, Score: {obj['score']:.2f}\n")
 # file.write("\n")  # 分隔每组数据
 # 字典
+#table = [
+    #["Name", "Age", "Position"],
+    #["Alice", 30, "Developer"],
+    #["Bob", 25, "Designer"],
+    #["Charlie", 35, "Manager"]
+#]
 
-obj_u = [
-    {'class': 0, 'x': 23, 'y': 67},
-    {'class': 1, 'x': 56, 'y': 88},
-    {'class': 4, 'x': 36, 'y': 88},
-    {'class': 2, 'x': 11, 'y': 25},
-    {'class': 0, 'x': 36, 'y': 11},
-    {'class': 3, 'x': 25, 'y': 34},
-    {'class': 2, 'x': 25, 'y': 11},
-    {'class': 1, 'x': 25, 'y': 11},
-]
+#for row in table:
+    #for column in row:
+        #print(column, end="\t")  # 使用制表符分隔列数据
+    #print()  # 每行结束后换行
+
+# tup = (1, 2, 3, 4, 5)
+
+# for item in tup:
+    # print(item)
+
+dictionary = {
+    "class": "fruit",
+    "x1": 63,
+    "y1": 74,
+    "x2": 26,
+    "y2": 51,
+}
+a = dictionary
+x1 = a["x1"]
+y1 = a["y1"]
+x2 = a["x2"]
+y2 = a["y2"]
+x = (x1 + x2)/2
+y = (y1 + y2)/2
+print(x, y)
 
 
-def text_az(inp):
-    recyclable_waste = []  # 初始化可回收对象
-    hazardous_waste = []  # 有害垃圾
-    food_waste = []  # 厨余垃圾
-    other_waste = []  # 其他垃圾
-
-    # 遍历已检测到的所有对象
-    for obj in inp:
-        if 0 <= obj['class'] < 1:
-            other_waste.append(obj)  # 将符合条件的对象添加到新列表中
-        if 1 <= obj['class'] < 2:
-            hazardous_waste.append(obj)
-        if 2 <= obj['class'] < 3:
-            recyclable_waste.append(obj)
-        if 3 <= obj['class'] <= 4:
-            food_waste.append(obj)
-
-    return other_waste, hazardous_waste, recyclable_waste, food_waste
 
 
-result = text_az(obj_u)
-print(result)
-print(result[0])
+
+# 只遍历键
+#for a in dictionary:
+   #print(a)
+# 或者使用keys()方法
+#for a in dictionary.keys():
+    #print(a)
+# 遍历键值对
+# a, b in dictionary.items():
+   # print(f"{a}: {b}")
+# 遍历值
+#for asd in dictionary.values():
+    #print(asd)

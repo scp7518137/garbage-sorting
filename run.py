@@ -89,14 +89,18 @@ while True:     # 判断是或否有帧输出，如果没有则终止程序
 
         # 再次得到坐标放进列表
         libraries.add_detected_objects_to_list(boxes, classes, scores, frame.shape[:2], detected_objects)
-
         classified_objects = libraries.classify_class(detected_objects)   # 使用分类函数分开不同种类的垃圾
         # buffer_str.clear()  # 清除缓存列表
-        for index, obj in enumerate(classified_objects):  # 利用enumerate函数例举出所有对象的值并放在obj当中
-            x = (obj['x1'] + obj['x2']) / 2     # 计算中心点x坐标
-            y = (obj['y1'] + obj['y2']) / 2     # 计算中心点y坐标
+        result0 = libraries.order_clamp(classified_objects[0])  # result0包含0位置的所有中心坐标
+        # 插入舵机控制程序
+        result1 = libraries.order_clamp(classified_objects[1])
+        # 插入舵机控制程序
+        result2 = libraries.order_clamp(classified_objects[2])
+        # 插入舵机控制程序
+        result3 = libraries.order_clamp(classified_objects[3])
+        # 插入舵机控制程序
 
-            cv2.imshow('show', frame)  # 展示图像
+        cv2.imshow('show', frame)  # 展示图像
     time.sleep(capture_interval)    # 等待capture_interval秒后拍下一张照片
 
     if cv2.waitKey(1) & 0xFF == ord('q'):   # 检测到q键之后关闭窗口

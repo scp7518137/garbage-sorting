@@ -1,6 +1,7 @@
 import tensorflow as tf
 import os
 import sys
+import cv2
 
 
 def conversion_model(model_path1, output_model_path):
@@ -56,3 +57,12 @@ def classify_class(detected_objects):
         if 37 <= obj['class'] <= 39:
             food_waste.append(obj)
     return recyclable_waste, hazardous_waste, food_waste, other_waste  # 返回筛选后的列表
+
+
+def order_clamp(list_garbage):
+    result = []
+    for i in list_garbage:
+        x = i['x1']+i['x2']
+        y = i['y1']+i['y2']
+        result.append([x,y])
+    return result
