@@ -9,7 +9,7 @@ if not pi.connected:
     print("Failed to connect to pigpio daemon")
 else:
     # 设置GPIO引脚编号
-    gpio_pin = 27
+    gpio_pin = 2
 
     # 设置PWM频率（通常50Hz对于舵机来说是合适的）
     pi.set_PWM_frequency(gpio_pin, 50)
