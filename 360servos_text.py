@@ -9,14 +9,13 @@ if not pi.connected:
     print("Failed to connect to pigpio daemon")
 else:
     # 设置GPIO引脚编号
-    gpio_pin = 2
+    gpio_pin = 17
 
     # 设置PWM频率（通常50Hz对于舵机来说是合适的）
     pi.set_PWM_frequency(gpio_pin, 50)
 
-    # PWM占空比范围从7.5% (全停) 到 12.5% (全速)
     # 根据具体舵机调整这个值，这里只是一个示例
-    Counterclockwise = 1500
+    Counterclockwise = 2000
     pi.set_servo_pulsewidth(gpio_pin, Counterclockwise)
 
     # 让舵机运行一段时间
