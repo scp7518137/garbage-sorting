@@ -3,17 +3,10 @@ import numpy as np
 import cv2
 import time
 import pigpio
+import ServoControl
 import libraries    # 导入自己写的函数库
 
 pi = pigpio.pi()
-
-i = 0
-
-frequency = 50
-
-zero = 750     # 微秒，对应0度
-oh_eighty = 2250    # 微秒，对应180度
-ninety = 1500   # 微秒，对应90度
 
 # buffer_str = []   # 创建缓存区
 model_path1 = '/home/classify/garbage-sorting/model/input/best.h5'  # 输入加载模型绝对路径
