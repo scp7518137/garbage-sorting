@@ -12,12 +12,12 @@ ServoControl.setPWMServoMoveByArray(b, 4, 1000)
 #ServoControl.setPWMServoMove(2, 800, 1000)
 #ServoControl.setPWMServoMove(3, 800, 1000)
 #ServoControl.setPWMServoMove(4, 800, 1000)
-#spl = [9,1000,11,2000]
-#spr = [9,2000,11,1000]
-#spf = [8,1000,10,2000]
-#spa = [8,2000,10,1000]
-#stfa = [8,1500,10,1500]
-#stlr = [9,1500,11,1500]
+spl = [9,1000,11,2000]
+spr = [9,2000,11,1000]
+spf = [8,1000,10,2000]
+spa = [8,2000,10,1000]
+stfa = [8,1500,10,1500]
+stlr = [9,1500,11,1500]
 #ServoControl.setPWMServoMoveByArray(spa,2,100)
 #time.sleep(1)
 #ServoControl.setPWMServoMoveByArray(stfa,2,100)
