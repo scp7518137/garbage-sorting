@@ -2,7 +2,8 @@ import cv2
 
 i = 0
 while 1:
-    device = f'/dev/video{i}'
+    #device = f'/dev/video{i}'
+    device = i
 
     cap = cv2.VideoCapture(device)
     if cap.isOpened():
