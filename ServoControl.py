@@ -1,4 +1,3 @@
-import time
 import serial
 
 LOBOT__FRAME_HEADER              = 0x55
@@ -147,4 +146,31 @@ def setGroupSpeed(group_id, group_speed):
     buf.append(speed_list[0])    # 速度
     buf.append(speed_list[1])
     serialHandle.write(buf)
-    
+
+def set360PWMServoMoveByArray(servos, servos_count, time):
+    buf = bytearray(b'\x55\x55')  # 帧头
+    buf.append(servos_count*3+5)  # 数据长度
+    buf.append(LOBOT_CMD_SERVO_MOVE)  # 指令
+
+    servos_count = 1 if servos_count < 1 else servos_count
+    servos_count = 254 if servos_count > 254 else servos_count
+    buf.append(servos_count)  # 要控制的舵机个数
+
+    time = 0 if time < 0 else time
+    time = 30000 if time > 30000 else time
+    time_list = list(time.to_bytes(2, 'little'))
+    buf.append(time_list[0])  # 时间
+    buf.append(time_list[1])
+
+    for i in range(servos_count):
+        buf.append(servos[i*2])  # 舵机ID
+
+        speed = servos[i*2+1]
+        # 限制速度在合理范围内
+        speed = 500 if speed < 500 else speed
+        speed = 2500 if speed > 2500 else speed
+        speed_list = list(speed.to_bytes(2, 'little'))
+        buf.append(speed_list[0])  # 速度
+        buf.append(speed_list[1])
+
+    serialHandle.write(buf)
