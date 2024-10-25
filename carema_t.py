@@ -1,7 +1,7 @@
 import cv2
 
 # 选择视频源，0通常是默认的内置或第一个连接的摄像头
-cap = cv2.VideoCapture(14)
+cap = cv2.VideoCapture(0)
 
 # 检查摄像头是否成功打开
 if not cap.isOpened():
