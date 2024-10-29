@@ -8,7 +8,7 @@ output_model_path = 'model/'  # 模型输出路径
 
 libraries.conversion_model(model_path1, output_model_path)  # 调用函数
 
-interpreter = tf.lite.Interpreter(model_path=output_model_path)     # 从模型指定路径加载并且创建实例tf.lite.Interpreter使用模型
+interpreter = tf.lite.Interpreter(model_path1)     # 从模型指定路径加载并且创建实例tf.lite.Interpreter使用模型
 interpreter.allocate_tensors()  # 为模型所有张量分配空间
 
 input_details = interpreter.get_input_details()
