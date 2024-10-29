@@ -3,8 +3,8 @@ import numpy as np
 import cv2
 import libraries    # 导入自己写的函数库
 
-model_path1 = '/home/classify/garbage-sorting/model/input/best.h5'  # 输入加载模型绝对路径
-output_model_path = '/home/classify/garbage-sorting/model/'  # 模型输出路径
+model_path1 = 'model/input/best.h5'  # 输入加载模型绝对路径
+output_model_path = 'model/'  # 模型输出路径
 
 libraries.conversion_model(model_path1, output_model_path)  # 调用函数
 
