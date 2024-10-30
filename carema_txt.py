@@ -15,7 +15,6 @@ input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()   # 获取模型的输入和输出细节
 
 cap = cv2.VideoCapture('/dev/video0')  # 选定摄像头
-capture_interval = 10   # 拍摄间隔
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)  # 宽度像素
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)  # 高度像素
 

@@ -1,29 +1,35 @@
 import cv2
 
-# 选择视频源，0通常是默认的内置或第一个连接的摄像头
-cap = cv2.VideoCapture(0)
+camera_id = 0
 
-# 检查摄像头是否成功打开
+# 创建一个VideoCapture对象
+cap = cv2.VideoCapture(camera_id)
+
+# 检查是否成功打开了摄像头
 if not cap.isOpened():
     print("无法打开摄像头")
-    exit()
 
 while True:
-    # 读取一帧图像
     ret, frame = cap.read()
+    if ret:
+        height, width, _ = frame.shape
+        center_x = width // 2
+        center_y = height // 2
+        box_size = 50
 
-    # 如果正确读取帧，ret将为True
-    if not ret:
-        print("无法接收帧 (可能已达到视频结尾？)。退出...")
-        break
+        start_point = (center_x - box_size, center_y - box_size)
+        end_point = (center_x + box_size, center_y + box_size)
 
-    # 显示结果帧
-    cv2.imshow('Camera Feed', frame)
+        frame = cv2.rectangle(frame, start_point, end_point, color=(0, 255, 0), thickness=1)
 
-    # 按下'q'键退出循环
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+        cv2.imshow('Image with Box', frame)
 
-# 当一切完成后，释放VideoCapture对象
+        while True:
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
+    else:
+        print("无法获取帧，请检查摄像头是否正常工作")
+
 cap.release()
 cv2.destroyAllWindows()
